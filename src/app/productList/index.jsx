@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 
 import "./index.css";
@@ -11,6 +11,7 @@ function ProductList({ onHomeClick }) {
   // redux store
   const dispath = useDispatch();
   const addedToCartTotal = useSelector((state) => state.cart.total);
+  const addedToCartItems = useSelector((state) => state.cart.items);
 
   const [showCart, setShowCart] = useState(false);
   const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
@@ -258,7 +259,14 @@ function ProductList({ onHomeClick }) {
     },
   ];
 
-  const [addedToCart, setAddedToCart] = useState({});
+  const addedToCart = useMemo(
+    () =>
+      addedToCartItems.reduce(
+        (obj, item) => ({ ...obj, [item.name]: true }),
+        {}
+      ),
+    [addedToCartItems]
+  );
 
   const styleObj = {
     backgroundColor: "#4CAF50",
@@ -302,7 +310,6 @@ function ProductList({ onHomeClick }) {
   };
 
   const handleAddToCart = (plant) => {
-    setAddedToCart({ ...addedToCart, [plant.name]: true });
     dispath(addItem(plant));
     dispath(updateQuantity(1));
   };
